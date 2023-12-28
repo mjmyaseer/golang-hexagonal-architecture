@@ -4,7 +4,9 @@ import (
 	"banking/errs"
 	"banking/logger"
 	"database/sql"
+	"fmt"
 	"github.com/jmoiron/sqlx"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -51,7 +53,14 @@ func (cr CustomerRepositoryDB) ById(id string) (*Customer, *errs.AppError) {
 }
 
 func NewCustomerRepositoryDB() CustomerRepositoryDB {
-	client, err := sqlx.Open("mysql", "root:admin@tcp(localhost:3306)/banking")
+	dbUser := os.Getenv("DB_USER")
+	dbPasswd := os.Getenv("DB_PASSWD")
+	dbAddr := os.Getenv("DB_ADDR")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	datasource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPasswd, dbAddr, dbPort, dbName)
+	client, err := sqlx.Open("mysql", datasource)
 	if err != nil {
 		panic(err)
 	}
